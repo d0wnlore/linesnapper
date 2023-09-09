@@ -2,12 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import './popup.css';
 
-const provider = new ethers.JsonRpcProvider('https://sepolia-rpc.scroll.io/');
+const scrollProvider = new ethers.JsonRpcProvider(
+  'https://sepolia-rpc.scroll.io/'
+);
+const zkSyncProvider = new ethers.JsonRpcProvider(
+  'https://testnet.era.zksync.dev'
+);
 const abi = ['function retrieve() view returns (string)'];
-const contract = new ethers.Contract(
+const scrollContract = new ethers.Contract(
   '0x94311760180EEF5A2365Aa36Ee4Bf7cBC6aF8bc6',
   abi,
-  provider
+  scrollProvider
+);
+const zkSyncContract = new ethers.Contract(
+  '0x1093A313F81141CB1ABF6B4E73f2C4B683167976',
+  abi,
+  zkSyncProvider
 );
 
 const INITIAL_CONDITIONS = {
@@ -73,8 +83,10 @@ function Popup() {
   };
 
   const getKeywordList = async () => {
-    let tldString = await contract.retrieve();
-    setKeywordList(tldString.split(', ').map((item) => item.replace(/'/g, '')));
+    let keywordString = await scrollContract.retrieve();
+    setKeywordList(
+      keywordString.split(', ').map((item) => item.replace(/'/g, ''))
+    );
   };
 
   return (
