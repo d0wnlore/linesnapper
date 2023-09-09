@@ -1,5 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 import './popup.css';
+
+const provider = new ethers.JsonRpcProvider('https://sepolia-rpc.scroll.io/');
+const abi = [
+  {
+    inputs: [],
+    name: 'retrieve',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+];
+const contract = new ethers.Contract(
+  '0x5Be485f97bad2b63E57DBb7d43113065E328C34C',
+  abi,
+  provider
+);
 
 const INITIAL_CONDITIONS = {
   'Domain has a dash (-)': null,
@@ -11,6 +28,8 @@ function Popup() {
   const [conditions, setConditions] = useState(INITIAL_CONDITIONS);
   const [grade, setGrade] = useState(null);
   const [domain, setDomain] = useState(null);
+  const [blockNo, setBlockNo] = useState(null);
+  const [contractData, setContractData] = useState(null);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -24,6 +43,8 @@ function Popup() {
       setConditions(updatedConditions);
       setGrade(determinedGrade);
       setDomain(domain);
+      getBlockNo();
+      getContractData();
     });
   }, []);
 
@@ -64,6 +85,14 @@ function Popup() {
     return phishingGrades.includes(grade);
   };
 
+  const getBlockNo = async () => {
+    setBlockNo(await provider.getBlockNumber());
+  };
+
+  const getContractData = async () => {
+    setContractData(await contract.retrieve());
+  };
+
   return (
     <div className="App">
       {grade ? (
@@ -74,6 +103,12 @@ function Popup() {
           )}
           <p>
             <strong>{domain}</strong>
+          </p>
+          <p>
+            <strong>{blockNo}</strong>
+          </p>
+          <p>
+            <strong>{contractData}</strong>
           </p>
         </>
       ) : (
