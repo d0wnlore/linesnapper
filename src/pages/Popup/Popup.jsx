@@ -3,9 +3,9 @@ import { ethers } from 'ethers';
 import './popup.css';
 
 const provider = new ethers.JsonRpcProvider('https://sepolia-rpc.scroll.io/');
-const abi = ['function retrieve() view returns (uint256)'];
+const abi = ['function retrieve() view returns (string)'];
 const contract = new ethers.Contract(
-  '0x5Be485f97bad2b63E57DBb7d43113065E328C34C',
+  '0x94311760180EEF5A2365Aa36Ee4Bf7cBC6aF8bc6',
   abi,
   provider
 );
@@ -21,24 +21,24 @@ function Popup() {
   const [grade, setGrade] = useState(null);
   const [domain, setDomain] = useState(null);
   const [blockNo, setBlockNo] = useState(null);
-  const [contractData, setContractData] = useState(null);
+  const [tldList, setTldList] = useState(null);
 
   useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       const domain = new URL(tabs[0].url).hostname
         .split('.')
         .slice(-2)
         .join('.');
-      const updatedConditions = getUpdatedConditions(domain);
-
-      const determinedGrade = determineGrade(updatedConditions);
-      setConditions(updatedConditions);
-      setGrade(determinedGrade);
       setDomain(domain);
-      getBlockNo();
-      getContractData();
+      await getTldList();
     });
   }, []);
+
+  useEffect(() => {
+    if (tldList && domain) {
+      evaluateDomain(domain);
+    }
+  }, [tldList, domain]);
 
   const determineGradeColor = (grade) => {
     const grades = ['A', 'B', 'C', 'D', 'F'];
@@ -54,12 +54,17 @@ function Popup() {
     return colors[Math.min(index, 5)];
   };
 
+  const evaluateDomain = (domain) => {
+    const updatedConditions = getUpdatedConditions(domain);
+    const determinedGrade = determineGrade(updatedConditions);
+    setConditions(updatedConditions);
+    setGrade(determinedGrade);
+  };
+
   const getUpdatedConditions = (domain) => ({
     ...conditions,
     'Domain has a dash (-)': domain.includes('-'),
-    'Domain uses a suspicious TLD': ['.gift'].some((tld) =>
-      domain.endsWith(tld)
-    ),
+    'Domain uses a suspicious TLD': tldList.some((tld) => domain.endsWith(tld)),
     'Domain has suspicious keywords': ['usdc'].some((token) =>
       domain.includes(token)
     ),
@@ -81,8 +86,11 @@ function Popup() {
     setBlockNo(await provider.getBlockNumber());
   };
 
-  const getContractData = async () => {
-    setContractData(await contract.retrieve());
+  const getTldList = async () => {
+    let tldString = await contract.retrieve();
+    setTldList(
+      tldString.split(',').map((item) => item.trim().replace(/'/g, ''))
+    );
   };
 
   return (
@@ -100,7 +108,7 @@ function Popup() {
             <strong>{blockNo}</strong>
           </p>
           <p>
-            <strong>Contract Data: {parseInt(contractData)}</strong>
+            <strong>TLD list: {tldList}</strong>
           </p>
         </>
       ) : (
