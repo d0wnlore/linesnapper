@@ -1,6 +1,10 @@
 <img src="src/assets/img/icon-128.png" width="64"/>
 
-# Chrome Extension (MV3) Boilerplate with React 18 and Webpack 5
+# Linesnapper
+
+Scroll Sepolia contract: [0x94311760180eef5a2365aa36ee4bf7cbc6af8bc6](https://sepolia.scrollscan.dev/address/0x94311760180eef5a2365aa36ee4bf7cbc6af8bc6#code)
+
+**Below is README content from the original boilerplate (including setup)**
 
 [![npm](https://img.shields.io/npm/v/chrome-extension-boilerplate-react)](https://www.npmjs.com/package/chrome-extension-boilerplate-react)
 [![npm-download](https://img.shields.io/npm/dw/chrome-extension-boilerplate-react)](https://www.npmjs.com/package/chrome-extension-boilerplate-react)
