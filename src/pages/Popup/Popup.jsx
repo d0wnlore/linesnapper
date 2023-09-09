@@ -12,44 +12,35 @@ const contract = new ethers.Contract(
 
 const INITIAL_CONDITIONS = {
   'Domain has a dash (-)': null,
-  'Domain uses a suspicious TLD': null,
-  'Domain has suspicious keywords': null,
+  'Domain uses a suspicious keyword or TLD': null,
 };
 
 function Popup() {
   const [conditions, setConditions] = useState(INITIAL_CONDITIONS);
   const [grade, setGrade] = useState(null);
+  const [hostname, setHostname] = useState(null);
   const [domain, setDomain] = useState(null);
-  const [blockNo, setBlockNo] = useState(null);
-  const [tldList, setTldList] = useState(null);
+  const [keywordList, setKeywordList] = useState(null);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-      const domain = new URL(tabs[0].url).hostname
-        .split('.')
-        .slice(-2)
-        .join('.');
+      const hostname = new URL(tabs[0].url).hostname;
+      const domain = hostname.split('.').slice(-2).join('.');
+      setHostname(hostname);
       setDomain(domain);
-      await getTldList();
+      await getKeywordList();
     });
   }, []);
 
   useEffect(() => {
-    if (tldList && domain) {
+    if (keywordList && domain) {
       evaluateDomain(domain);
     }
-  }, [tldList, domain]);
+  }, [keywordList, domain]);
 
   const determineGradeColor = (grade) => {
-    const grades = ['A', 'B', 'C', 'D', 'F'];
-    const colors = [
-      '#00FF00',
-      '#ADFF2F',
-      '#FFFF00',
-      '#FFA500',
-      '#FF0000',
-      '#888888',
-    ];
+    const grades = ['🟢', '🟡', '🔴'];
+    const colors = ['#00FF00', '#FFFF00', '#FF0000', '#888888'];
     const index = grades.indexOf(grade);
     return colors[Math.min(index, 5)];
   };
@@ -64,33 +55,26 @@ function Popup() {
   const getUpdatedConditions = (domain) => ({
     ...conditions,
     'Domain has a dash (-)': domain.includes('-'),
-    'Domain uses a suspicious TLD': tldList.some((tld) => domain.endsWith(tld)),
-    'Domain has suspicious keywords': ['usdc'].some((token) =>
-      domain.includes(token)
+    'Domain uses a suspicious keyword or TLD': keywordList.some((keyword) =>
+      hostname.includes(keyword)
     ),
   });
 
   const determineGrade = (updatedConditions) => {
     const negativeConditionsCount =
       Object.values(updatedConditions).filter(Boolean).length;
-    const grades = ['A', 'B', 'C', 'D', 'F'];
+    const grades = ['🟢', '🟡', '🔴'];
     return grades[Math.min(negativeConditionsCount, 4)];
   };
 
   const isPhishingGrade = (grade) => {
-    const phishingGrades = ['B', 'C', 'D', 'F'];
+    const phishingGrades = ['🟡', '🔴'];
     return phishingGrades.includes(grade);
   };
 
-  const getBlockNo = async () => {
-    setBlockNo(await provider.getBlockNumber());
-  };
-
-  const getTldList = async () => {
+  const getKeywordList = async () => {
     let tldString = await contract.retrieve();
-    setTldList(
-      tldString.split(',').map((item) => item.trim().replace(/'/g, ''))
-    );
+    setKeywordList(tldString.split(', ').map((item) => item.replace(/'/g, '')));
   };
 
   return (
@@ -99,17 +83,8 @@ function Popup() {
         <>
           <h1 style={{ color: determineGradeColor(grade) }}>Grade: {grade}</h1>
           {isPhishingGrade(grade) && (
-            <h2 style={{ color: 'red' }}>🎣 Phishing</h2>
+            <h3 style={{ color: 'red' }}>{domain} is 🎣 Phishing</h3>
           )}
-          <p>
-            <strong>{domain}</strong>
-          </p>
-          <p>
-            <strong>{blockNo}</strong>
-          </p>
-          <p>
-            <strong>TLD list: {tldList}</strong>
-          </p>
         </>
       ) : (
         <h1>Grade: Not Determined</h1>
