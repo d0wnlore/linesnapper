@@ -3,15 +3,7 @@ import { ethers } from 'ethers';
 import './popup.css';
 
 const provider = new ethers.JsonRpcProvider('https://sepolia-rpc.scroll.io/');
-const abi = [
-  {
-    inputs: [],
-    name: 'retrieve',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-];
+const abi = ['function retrieve() view returns (uint256)'];
 const contract = new ethers.Contract(
   '0x5Be485f97bad2b63E57DBb7d43113065E328C34C',
   abi,
@@ -108,7 +100,7 @@ function Popup() {
             <strong>{blockNo}</strong>
           </p>
           <p>
-            <strong>{contractData}</strong>
+            <strong>Contract Data: {parseInt(contractData)}</strong>
           </p>
         </>
       ) : (
