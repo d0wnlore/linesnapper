@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import './popup.css';
+import './Popup.css';
 
 const scrollProvider = new ethers.JsonRpcProvider(
   'https://sepolia-rpc.scroll.io/'
@@ -21,8 +21,8 @@ const zkSyncContract = new ethers.Contract(
 );
 
 const INITIAL_CONDITIONS = {
-  'Domain has a dash (-)': null,
-  'Domain uses a suspicious keyword or TLD': null,
+  'Not using a dash (-)': null,
+  'Not using suspicious keywords or TLD': null,
 };
 
 function Popup() {
@@ -73,8 +73,8 @@ function Popup() {
 
   const getUpdatedConditions = (domain) => ({
     ...conditions,
-    'Domain has a dash (-)': domain.includes('-'),
-    'Domain uses a suspicious keyword or TLD': keywordList.some((keyword) =>
+    'Not using a dash (-)': domain.includes('-'),
+    'Not using suspicious keywords or TLD': keywordList.some((keyword) =>
       hostname.includes(keyword)
     ),
   });
@@ -113,29 +113,28 @@ function Popup() {
     <div className="App">
       {grade ? (
         <>
-          <h1 style={{ color: determineGradeColor(grade) }}>Grade: {grade}</h1>
+          <h1 style={{ color: determineGradeColor(grade) }}>Grade {grade}</h1>
           {isPhishingGrade(grade) && (
-            <h3 style={{ color: 'red' }}>{domain} is 🎣 Phishing</h3>
+            <h3 style={{ color: 'red' }}>🎣 {domain} is phishing</h3>
           )}
         </>
       ) : (
-        <h1>Grade: ⏳</h1>
+        <h1>Loading ⏳</h1>
       )}
-      <p>Final grade based on:</p>
+      <p>Final grade based on domain:</p>
       <ul>
         {Object.entries(conditions).map(([condition, value], index) => (
           <li key={index}>
-            {condition}: {value === null ? '⏳' : value ? '✅' : '🚫'}
+            {value === null ? '⏳' : value ? '🚫' : '✅'} {condition}
           </li>
         ))}
       </ul>
       <p>
-        Using ruleset from <strong>{chain}</strong>
-      </p>
-      <p>
+        Using ruleset from <strong>{chain}</strong> (
         <a style={{ color: 'white' }} href="#" onClick={openOptionsPage}>
-          Extension Options
+          change
         </a>
+        )
       </p>
     </div>
   );

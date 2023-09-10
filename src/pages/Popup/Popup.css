@@ -4,7 +4,6 @@
   bottom: 0px;
   left: 0px;
   right: 0px;
-  text-align: center;
   height: 100%;
   padding: 10px;
   background-color: #282c34;
@@ -14,6 +13,22 @@
 .App-logo {
   height: 30vmin;
   pointer-events: none;
+}
+
+ul, li {
+  list-style-type: none;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  padding-left: 10px;
+  display: inline-block;
+}
+
+h1 {
+  text-align: center;
 }
 
 @media (prefers-reduced-motion: no-preference) {
