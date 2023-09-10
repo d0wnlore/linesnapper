@@ -119,7 +119,7 @@ function Popup() {
           )}
         </>
       ) : (
-        <h1>Grade: Determining…</h1>
+        <h1>Grade: ⏳</h1>
       )}
       <p>Final grade based on:</p>
       <ul>
