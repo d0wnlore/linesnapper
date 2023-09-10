@@ -28,7 +28,7 @@ const Options: React.FC<Props> = ({ title }: Props) => {
 
   return (
     <div className="OptionsContainer">
-      {title} Page
+      Ruleset Chain
       <div>
         <label>
           <input
