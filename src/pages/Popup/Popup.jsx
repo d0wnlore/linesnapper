@@ -133,7 +133,7 @@ function Popup() {
         Using ruleset from <strong>{chain}</strong>
       </p>
       <p>
-        <a href="#" onClick={openOptionsPage}>
+        <a style={{ color: 'white' }} href="#" onClick={openOptionsPage}>
           Extension Options
         </a>
       </p>
