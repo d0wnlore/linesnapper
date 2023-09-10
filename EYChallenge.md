@@ -4,6 +4,12 @@ A phishing website detection extension for Chrome, using rulesets stored onchain
 
 By d0wnlore (d0wnlore@pm.me)
 
+## What public networks does Linesnapper run on
+
+Currently Linesnapper runs on Scroll and zkSync Era. The ability to process a website's URL + HTML against the Linesnapper ruleset needs to be on a publicly accessible network.
+
+However the ruleset itself and the metadata around inidividual rules, such as their authors, does not need to be on a public network (but does need to be accessible by the contract or service that is publicly avaiable). So these pieces can run on privacy-perserving networks like Nightfall.
+
 ## Why Linesnapper would benefit from a privacy solution
 
 Currently rulesets used to detect phishing websites, and their authors, is publicly available to everyone, including scammers that we'd rather not disclose this data to.
