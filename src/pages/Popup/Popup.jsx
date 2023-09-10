@@ -31,6 +31,7 @@ function Popup() {
   const [hostname, setHostname] = useState(null);
   const [domain, setDomain] = useState(null);
   const [keywordList, setKeywordList] = useState(null);
+  const [chain, setChain] = useState(null);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
@@ -38,7 +39,15 @@ function Popup() {
       const domain = hostname.split('.').slice(-2).join('.');
       setHostname(hostname);
       setDomain(domain);
-      await getKeywordList();
+      await chrome.storage.sync.get(['option'], (result) => {
+        if (result.option === 'scroll') {
+          setChain('Scroll');
+          getScrollKeywordList();
+        } else {
+          setChain('zkSync Era');
+          getZkSyncKeywordList();
+        }
+      });
     });
   }, []);
 
@@ -82,11 +91,22 @@ function Popup() {
     return phishingGrades.includes(grade);
   };
 
-  const getKeywordList = async () => {
+  const getScrollKeywordList = async () => {
     let keywordString = await scrollContract.retrieve();
     setKeywordList(
       keywordString.split(', ').map((item) => item.replace(/'/g, ''))
     );
+  };
+
+  const getZkSyncKeywordList = async () => {
+    let keywordString = await zkSyncContract.retrieve();
+    setKeywordList(
+      keywordString.split(', ').map((item) => item.replace(/'/g, ''))
+    );
+  };
+
+  const openOptionsPage = () => {
+    chrome.runtime.openOptionsPage();
   };
 
   return (
@@ -99,16 +119,24 @@ function Popup() {
           )}
         </>
       ) : (
-        <h1>Grade: Not Determined</h1>
+        <h1>Grade: Determining…</h1>
       )}
       <p>Final grade based on:</p>
       <ul>
         {Object.entries(conditions).map(([condition, value], index) => (
           <li key={index}>
-            {condition}: {value === null ? '❓' : value ? '✅' : '🚫'}
+            {condition}: {value === null ? '⏳' : value ? '✅' : '🚫'}
           </li>
         ))}
       </ul>
+      <p>
+        Using ruleset from <strong>{chain}</strong>
+      </p>
+      <p>
+        <a href="#" onClick={openOptionsPage}>
+          Extension Options
+        </a>
+      </p>
     </div>
   );
 }
