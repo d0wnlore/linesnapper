@@ -1,10 +1,9 @@
-<img src="src/assets/img/icon-128.png" width="64"/>
-
 # Linesnapper
 
 A phishing website detection extension for Chrome, using rulesets stored onchain (Scroll and zkSync Era).
 
 Scroll Sepolia contract: [0x94311760180eef5a2365aa36ee4bf7cbc6af8bc6](https://sepolia.scrollscan.dev/address/0x94311760180eef5a2365aa36ee4bf7cbc6af8bc6#code)
+
 zkSync Era Testnet contract: [0x1093A313F81141CB1ABF6B4E73f2C4B683167976](https://goerli.explorer.zksync.io/address/0x1093A313F81141CB1ABF6B4E73f2C4B683167976#contract)
 
 **Below is README content from the original boilerplate (including setup)**
